@@ -2,8 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c010adf9-d6a8-4f08-87d3-c4e525013834" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/resources/application.properties" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" />
     </list>
     <ignored path="NotesApp.iws" />
@@ -705,12 +703,12 @@
       <workItem from="1481752911741" duration="2501000" />
       <workItem from="1481779771667" duration="944000" />
       <workItem from="1481783119228" duration="8251000" />
-      <workItem from="1481815482592" duration="748000" />
+      <workItem from="1481815482592" duration="902000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="12444000" />
+    <option name="totallyTimeSpent" value="12598000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
