@@ -4,6 +4,7 @@ import lombok.Data;
 
 import javax.persistence.Id;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -17,8 +18,5 @@ public class User {
     private String username;
     private String password;
     private String email;
-    private List<Note> notes;
-    public void addNote(Note note){
-        this.notes.add(note);
-    }
+    private List<Note> notes=new ArrayList<>();
 }

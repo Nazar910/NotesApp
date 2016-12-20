@@ -4,49 +4,62 @@ import app.model.Note;
 import app.model.User;
 import app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
+import java.util.Collection;
 
 /**
  * Created by pyvov on 15.12.2016.
  */
 @RestController
+@RequestMapping("/users")
 public class MainController {
 
     @Autowired
     UserService userService;
 
-
-    @RequestMapping(value = "/users/new-user",method = RequestMethod.POST)
-    public void createUser(@RequestBody User user){
-        userService.createUser(user);
+    @RequestMapping(value = "/all", method = RequestMethod.GET)
+    public Collection<User> getUsers() {
+        return userService.findAll();
     }
 
-    @RequestMapping(value = "/users/{id}",method = RequestMethod.DELETE)
-    public void deleteUser(@PathVariable BigInteger id){
-        userService.deleteUser(id);
+    @RequestMapping(value = "/{userId}", method = RequestMethod.GET)
+    public Collection<Note> getNotes(@PathVariable BigInteger userId) {
+        return userService.getNotes(userId);
     }
 
-    @RequestMapping(value = "/users/{id}",method = RequestMethod.POST)
-    public void updateUser(@PathVariable BigInteger id,@RequestBody User userBody){
-        userService.updateUser(id,userBody);
+    @RequestMapping(value = "/", method = RequestMethod.POST)
+    public ResponseEntity<?> createUser(@RequestBody User user) {
+        return userService.createUser(user);
     }
 
-    @RequestMapping(value = "/users/{id}/new-note",method = RequestMethod.POST)
-    public void addNote(@PathVariable BigInteger id,@RequestBody Note note){
-        userService.addNote(id,note);
+    @RequestMapping(value = "/{userId}", method = RequestMethod.DELETE)
+    public ResponseEntity<?> deleteUser(@PathVariable BigInteger userId) {
+        return userService.deleteUser(userId);
     }
 
-    @RequestMapping(value = "/users/{userId}/delete-note",method = RequestMethod.DELETE)
-    public void deleteNote(@PathVariable BigInteger userId,@RequestParam(value = "notes") int[] noteIds){
-        userService.deleteNote(userId,noteIds);
+    @RequestMapping(value = "/{userId}", method = RequestMethod.PUT)
+    public ResponseEntity<?> updateUser(@PathVariable BigInteger userId, @RequestBody User userBody) {
+        return userService.updateUser(userId, userBody);
     }
 
-    @RequestMapping(value = "/users/{userId}/update-note/{noteId}",method = RequestMethod.POST)
-    public void updateNote(@PathVariable(value = "userId") BigInteger userId,
+    @RequestMapping(value = "/{userId}", method = RequestMethod.POST)
+    public ResponseEntity<?> addNote(@PathVariable BigInteger userId, @RequestBody Note note) {
+        return userService.addNote(userId, note);
+    }
+
+    @RequestMapping(value = "/{userId}/delete-note", method = RequestMethod.DELETE)
+    public ResponseEntity<?> deleteNote(@PathVariable BigInteger userId, @RequestParam(value = "notes") int[] noteIds) {
+        return userService.deleteNote(userId, noteIds);
+    }
+
+    @RequestMapping(value = "/{userId}/{noteId}", method = RequestMethod.PUT)
+    public ResponseEntity<?> updateNote(@PathVariable(value = "userId") BigInteger userId,
                            @PathVariable(value = "noteId") int noteId,
-                           @RequestBody Note noteBody){
-        userService.updateNote(userId,noteId,noteBody);
+                           @RequestBody Note noteBody) {
+        return userService.updateNote(userId, noteId, noteBody);
     }
+
 }
