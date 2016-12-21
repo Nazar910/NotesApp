@@ -1,10 +1,13 @@
 package app.service;
 
+import app.exception.UserAlreadyExistsException;
 import app.exception.UserNotFoundException;
 import app.model.Note;
 import app.model.User;
 import app.model.UserRepository;
+import com.mongodb.MongoException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -24,11 +27,16 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseEntity<?> createUser(User user) {
         if (user != null) {
-            userRepository.save(user);
+            try {
+                userRepository.save(user);
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new UserAlreadyExistsException(user.getUsername());
+            }
             User result = userRepository.findByUsername(user.getUsername()).get();
             URI location = ServletUriComponentsBuilder
-                    .fromCurrentRequest().path("/users/{userId}")
-                    .buildAndExpand(result.getId()).toUri();
+                    .fromCurrentRequest().path("/users/{username}")
+                    .buildAndExpand(result.getUsername()).toUri();
             return ResponseEntity.created(location).build();
         }
         return ResponseEntity.noContent().build();
@@ -49,29 +57,30 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<?> deleteUser(BigInteger userId) {
-        this.validateUser(userId);
+    public ResponseEntity<?> deleteUser(String username) {
+        this.validateUser(username);
+        BigInteger userId = userRepository.findByUsername(username).get().getId();
         userRepository.delete(userId);
         return ResponseEntity.accepted().build();
     }
 
     @Override
-    public ResponseEntity<?> addNote(BigInteger userId, Note note) {
-        User user = this.validateUser(userId);
+    public ResponseEntity<?> addNote(String username, Note note) {
+        User user = this.validateUser(username);
         if (note != null) {
             user.getNotes().add(note);
             userRepository.save(user);
             URI location = ServletUriComponentsBuilder
-                    .fromCurrentRequest().path("/users/{userId}")
-                    .buildAndExpand(user.getId()).toUri();
+                    .fromCurrentRequest().path("/users/{username}")
+                    .buildAndExpand(user.getUsername()).toUri();
             return ResponseEntity.created(location).build();
         }
         return ResponseEntity.noContent().build();
     }
 
     @Override
-    public ResponseEntity<?> updateNote(BigInteger userId, int noteId, Note noteBody) {
-        User user = this.validateUser(userId);
+    public ResponseEntity<?> updateNote(String username, int noteId, Note noteBody) {
+        User user = this.validateUser(username);
         Note note = user.getNotes().get(noteId);
         note.setText(noteBody.getText());
         note.setTitle(noteBody.getTitle());
@@ -81,8 +90,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<?> deleteNote(BigInteger userId, int[] noteIds) {
-        User user = this.validateUser(userId);
+    public ResponseEntity<?> deleteNote(String username, int[] noteIds) {
+        User user = this.validateUser(username);
         for (int i = noteIds.length - 1; i >= 0; i--) {
             int noteId = noteIds[i];
             user.getNotes().remove(noteId);
@@ -92,8 +101,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<?> updateUser(BigInteger userId, User userBody) {
-        User user = this.validateUser(userId);
+    public ResponseEntity<?> updateUser(String username, User userBody) {
+        User user = this.validateUser(username);
         if (!this.isEmptyString(userBody.getEmail())) {
             user.setEmail(userBody.getEmail());
         }
@@ -116,18 +125,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Collection<Note> getNotes(BigInteger userId) {
-        return this.validateUser(userId).getNotes();
+    public Collection<Note> getNotes(String username) {
+        return this.validateUser(username).getNotes();
     }
 
     @Override
-    public User validateUser(BigInteger userId) {
-        return userRepository.findById(userId).orElseThrow(
-                () -> new UserNotFoundException(userId.toString())
+    public User validateUser(String username) {
+        return userRepository.findByUsername(username).orElseThrow(
+                () -> new UserNotFoundException(username)
         );
     }
 
     private boolean isEmptyString(String str) {
         return str == null || str.isEmpty();
     }
+
 }

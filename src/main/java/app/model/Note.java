@@ -14,4 +14,5 @@ public class Note {
     private String title;
     private String text;
     private LocalDateTime remindDate;
+
 }

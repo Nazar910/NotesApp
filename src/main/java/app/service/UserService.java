@@ -17,19 +17,19 @@ public interface UserService {
 
     User findByEmail(String email);
 
-    ResponseEntity<?> addNote(BigInteger userId, Note note);
+    ResponseEntity<?> addNote(String username, Note note);
 
-    ResponseEntity<?> updateNote(BigInteger userId, int noteId, Note noteBody);
+    ResponseEntity<?> updateNote(String username, int noteId, Note noteBody);
 
-    ResponseEntity<?> deleteNote(BigInteger userId, int[] noteIds);
+    ResponseEntity<?> deleteNote(String username, int[] noteIds);
 
-    ResponseEntity<?> updateUser(BigInteger userId, User user);
+    ResponseEntity<?> updateUser(String username, User user);
 
-    ResponseEntity<?> deleteUser(BigInteger userId);
+    ResponseEntity<?> deleteUser(String username);
 
     Collection<User> findAll();
 
-    Collection<Note> getNotes(BigInteger userId);
+    Collection<Note> getNotes(String username);
 
-    User validateUser(BigInteger userId);
+    User validateUser(String username);
 }

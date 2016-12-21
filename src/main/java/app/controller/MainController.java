@@ -14,7 +14,7 @@ import java.util.Collection;
  * Created by pyvov on 15.12.2016.
  */
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 public class MainController {
 
     @Autowired
@@ -25,9 +25,9 @@ public class MainController {
         return userService.findAll();
     }
 
-    @RequestMapping(value = "/{userId}", method = RequestMethod.GET)
-    public Collection<Note> getNotes(@PathVariable BigInteger userId) {
-        return userService.getNotes(userId);
+    @RequestMapping(value = "/{username}", method = RequestMethod.GET)
+    public Collection<Note> getNotes(@PathVariable String username) {
+        return userService.getNotes(username);
     }
 
     @RequestMapping(value = "/", method = RequestMethod.POST)
@@ -35,31 +35,31 @@ public class MainController {
         return userService.createUser(user);
     }
 
-    @RequestMapping(value = "/{userId}", method = RequestMethod.DELETE)
-    public ResponseEntity<?> deleteUser(@PathVariable BigInteger userId) {
-        return userService.deleteUser(userId);
+    @RequestMapping(value = "/{username}", method = RequestMethod.DELETE)
+    public ResponseEntity<?> deleteUser(@PathVariable String username) {
+        return userService.deleteUser(username);
     }
 
-    @RequestMapping(value = "/{userId}", method = RequestMethod.PUT)
-    public ResponseEntity<?> updateUser(@PathVariable BigInteger userId, @RequestBody User userBody) {
-        return userService.updateUser(userId, userBody);
+    @RequestMapping(value = "/{username}", method = RequestMethod.PUT)
+    public ResponseEntity<?> updateUser(@PathVariable String username, @RequestBody User userBody) {
+        return userService.updateUser(username, userBody);
     }
 
-    @RequestMapping(value = "/{userId}", method = RequestMethod.POST)
-    public ResponseEntity<?> addNote(@PathVariable BigInteger userId, @RequestBody Note note) {
-        return userService.addNote(userId, note);
+    @RequestMapping(value = "/{username}", method = RequestMethod.POST)
+    public ResponseEntity<?> addNote(@PathVariable String username, @RequestBody Note note) {
+        return userService.addNote(username, note);
     }
 
-    @RequestMapping(value = "/{userId}/delete-note", method = RequestMethod.DELETE)
-    public ResponseEntity<?> deleteNote(@PathVariable BigInteger userId, @RequestParam(value = "notes") int[] noteIds) {
-        return userService.deleteNote(userId, noteIds);
+    @RequestMapping(value = "/{username}/delete-note", method = RequestMethod.DELETE)
+    public ResponseEntity<?> deleteNote(@PathVariable String username, @RequestParam(value = "notes") int[] noteIds) {
+        return userService.deleteNote(username, noteIds);
     }
 
-    @RequestMapping(value = "/{userId}/{noteId}", method = RequestMethod.PUT)
-    public ResponseEntity<?> updateNote(@PathVariable(value = "userId") BigInteger userId,
+    @RequestMapping(value = "/{username}/{noteId}", method = RequestMethod.PUT)
+    public ResponseEntity<?> updateNote(@PathVariable(value = "username") String username,
                            @PathVariable(value = "noteId") int noteId,
                            @RequestBody Note noteBody) {
-        return userService.updateNote(userId, noteId, noteBody);
+        return userService.updateNote(username, noteId, noteBody);
     }
 
 }
