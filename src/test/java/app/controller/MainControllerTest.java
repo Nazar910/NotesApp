@@ -79,37 +79,30 @@ public class MainControllerTest {
 
         this.userRepository.deleteAll();
 
-        User newUser = new User();
-        newUser.setUsername(userName);
-        newUser.setPassword("password");
-        newUser.setEmail("email@");
-        userRepository.save(newUser);
+        User newUser = this.newUser(userName, "password", "email@", new ArrayList<>());
+        this.userRepository.save(newUser);
         this.user = userRepository.findByUsername(newUser.getUsername()).get();
-        Note newNote1 = new Note();
-        newNote1.setText("title1");
-        newNote1.setTitle("text1");
-        Note newNote2 = new Note();
-        newNote2.setText("title2");
-        newNote2.setTitle("text2");
+        Note newNote1 = this.newNote("title1", "text1");
+        Note newNote2 = this.newNote("title2", "text2");
         this.user.getNotes().add(newNote1);
         this.user.getNotes().add(newNote2);
-        userRepository.save(user);
-        noteId = 1L;
+        this.userRepository.save(user);
+        this.noteId = 1L;
     }
 
     @Test
     public void createAlreadyExistingUser() throws Exception {
         mockMvc.perform(post("/api/users/")
-                .content(this.json(newUser(userName,"","",new ArrayList<>())))
-                .contentType(contentType))
+                .content(this.json(this.newUser(this.userName, "", "", new ArrayList<>())))
+                .contentType(this.contentType))
                 .andExpect(status().isConflict());
     }
 
     @Test
     public void createNoteUserNotFound() throws Exception {
         mockMvc.perform(post("/api/users/george")
-                .content(this.json(newNote("title1", "text1")))
-                .contentType(contentType))
+                .content(this.json(this.newNote("title1", "text1")))
+                .contentType(this.contentType))
                 .andExpect(status().isNotFound());
     }
 
@@ -121,9 +114,9 @@ public class MainControllerTest {
 
     @Test
     public void getNotes() throws Exception {
-        mockMvc.perform(get("/api/users/" + userName))
+        mockMvc.perform(get("/api/users/" + this.userName))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
+                .andExpect(content().contentType(this.contentType))
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].title", is(this.user.getNotes().get(0).getTitle())))
                 .andExpect(jsonPath("$[0].text", is(this.user.getNotes().get(0).getText())))
@@ -135,54 +128,70 @@ public class MainControllerTest {
     public void getUsers() throws Exception {
         mockMvc.perform(get("/api/users/all"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$",hasSize(1)))
-                .andExpect(jsonPath("$[0].username",is(this.user.getUsername())))
-                .andExpect(jsonPath("$[0].password",is(this.user.getPassword())))
-                .andExpect(jsonPath("$[0].email",is(this.user.getEmail())));
+                .andExpect(content().contentType(this.contentType))
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].username", is(this.user.getUsername())))
+                .andExpect(jsonPath("$[0].password", is(this.user.getPassword())))
+                .andExpect(jsonPath("$[0].email", is(this.user.getEmail())));
     }
 
     @Test
     public void createUser() throws Exception {
         mockMvc.perform(post("/api/users/")
                 .content(this.json(newUser("user1", "password1", "email@1", new ArrayList<>())))
-                .contentType(contentType))
+                .contentType(this.contentType))
                 .andExpect(status().isCreated());
     }
 
     @Test
+    public void createUserNullBody() throws Exception {
+        mockMvc.perform(post("/api/users/")
+                .content(this.json(new User()))
+                .contentType(this.contentType))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
     public void updateUser() throws Exception {
-        mockMvc.perform(put("/api/users/" + userName)
-                .content(json(newUser(userName, "password1", "email@1", new ArrayList<>())))
-                .contentType(contentType))
+        mockMvc.perform(put("/api/users/" + this.userName)
+                .content(json(newUser(this.userName, "password1", "email@1", new ArrayList<>())))
+                .contentType(this.contentType))
                 .andExpect(status().isAccepted());
     }
 
     @Test
     public void deleteUser() throws Exception {
-        mockMvc.perform(delete("/api/users/" + userName))
+        mockMvc.perform(delete("/api/users/" + this.userName))
                 .andExpect(status().isAccepted());
     }
 
     @Test
-    public void addNote() throws Exception {
-        mockMvc.perform(post("/api/users/" + userName)
+    public void createNote() throws Exception {
+        mockMvc.perform(post("/api/users/" + this.userName)
                 .content(this.json(newNote("title3", "text3")))
-                .contentType(contentType))
+                .contentType(this.contentType))
                 .andExpect(status().isCreated());
     }
 
     @Test
+    public void createNoteNullBody() throws Exception {
+        mockMvc.perform(post("/api/users/" + this.userName)
+                .content(this.json(new Note()))
+                .contentType(this.contentType))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
     public void updateNote() throws Exception {
-        mockMvc.perform(put("/api/users/" + userName + "/" + noteId)
+        mockMvc.perform(put("/api/users/" + this.userName + "/" + this.noteId)
                 .content(this.json(newNote("title11", "text11")))
-                .contentType(contentType))
+                .contentType(this.contentType))
                 .andExpect(status().isAccepted());
     }
 
     @Test
     public void deleteNote() throws Exception {
-        mockMvc.perform(delete("/api/users/" + userName + "/delete-note?notes="+noteId))
+        mockMvc.perform(delete("/api/users/" + this.userName + "/delete-note?notes=" + this.noteId))
                 .andExpect(status().isAccepted());
     }
 

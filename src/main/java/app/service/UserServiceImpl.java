@@ -26,7 +26,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<?> createUser(User user) {
-        if (user != null) {
+        if (userIsNotNull(user) &&
+                (!user.getUsername().equals("") ||
+                        !user.getPassword().equals("") ||
+                        !user.getEmail().equals(""))) {
             try {
                 userRepository.save(user);
             } catch (Exception e) {
@@ -67,7 +70,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseEntity<?> addNote(String username, Note note) {
         User user = this.validateUser(username);
-        if (note != null) {
+        if (noteIsNotNull(note) &&
+                (!note.getText().equals("") ||
+                        !note.getTitle().equals(""))) {
             user.getNotes().add(note);
             userRepository.save(user);
             URI location = ServletUriComponentsBuilder
@@ -129,11 +134,19 @@ public class UserServiceImpl implements UserService {
         return this.validateUser(username).getNotes();
     }
 
-    @Override
-    public User validateUser(String username) {
+    private User validateUser(String username) {
         return userRepository.findByUsername(username).orElseThrow(
                 () -> new UserNotFoundException(username)
         );
+    }
+
+    private boolean userIsNotNull(User user) {
+        return (user != null && user.getUsername() != null && user.getPassword() != null && user.getEmail() != null);
+    }
+
+
+    private boolean noteIsNotNull(Note note) {
+        return (note != null && note.getText() != null && note.getText() != null);
     }
 
     private boolean isEmptyString(String str) {

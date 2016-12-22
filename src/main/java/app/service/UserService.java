@@ -30,6 +30,4 @@ public interface UserService {
     Collection<User> findAll();
 
     Collection<Note> getNotes(String username);
-
-    User validateUser(String username);
 }
