@@ -1,6 +1,7 @@
 package app.controller;
 
 import app.model.Note;
+import app.model.NoteDto;
 import app.model.User;
 import app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,8 +47,8 @@ public class MainController {
     }
 
     @RequestMapping(value = "/{username}", method = RequestMethod.POST)
-    public ResponseEntity<?> addNote(@PathVariable String username, @RequestBody Note note) {
-        return userService.addNote(username, note);
+    public ResponseEntity<?> addNote(@PathVariable String username, @RequestBody NoteDto noteDto) {
+        return userService.addNote(username, noteDto);
     }
 
     @RequestMapping(value = "/{username}/delete-note", method = RequestMethod.DELETE)
@@ -58,8 +59,8 @@ public class MainController {
     @RequestMapping(value = "/{username}/{noteId}", method = RequestMethod.PUT)
     public ResponseEntity<?> updateNote(@PathVariable(value = "username") String username,
                            @PathVariable(value = "noteId") int noteId,
-                           @RequestBody Note noteBody) {
-        return userService.updateNote(username, noteId, noteBody);
+                           @RequestBody NoteDto noteDto) {
+        return userService.updateNote(username, noteId, noteDto);
     }
 
 }

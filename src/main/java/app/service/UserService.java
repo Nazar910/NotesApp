@@ -1,6 +1,7 @@
 package app.service;
 
 import app.model.Note;
+import app.model.NoteDto;
 import app.model.User;
 import org.springframework.http.ResponseEntity;
 
@@ -17,9 +18,9 @@ public interface UserService {
 
     User findByEmail(String email);
 
-    ResponseEntity<?> addNote(String username, Note note);
+    ResponseEntity<?> addNote(String username, NoteDto noteDto);
 
-    ResponseEntity<?> updateNote(String username, int noteId, Note noteBody);
+    ResponseEntity<?> updateNote(String username, int noteId, NoteDto noteDto);
 
     ResponseEntity<?> deleteNote(String username, int[] noteIds);
 

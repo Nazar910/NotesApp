@@ -2,9 +2,7 @@ package app.service;
 
 import app.exception.UserAlreadyExistsException;
 import app.exception.UserNotFoundException;
-import app.model.Note;
-import app.model.User;
-import app.model.UserRepository;
+import app.model.*;
 import com.mongodb.MongoException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
@@ -68,11 +66,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<?> addNote(String username, Note note) {
+    public ResponseEntity<?> addNote(String username, NoteDto noteDto) {
         User user = this.validateUser(username);
-        if (noteIsNotNull(note) &&
-                (!note.getText().equals("") ||
-                        !note.getTitle().equals(""))) {
+        if (noteIsNotNull(noteDto) &&
+                (!noteDto.getText().equals("") ||
+                        !noteDto.getTitle().equals(""))) {
+            Note note = noteDto.getRemindDate() == null ? new Note(noteDto.getTitle(), noteDto.getText())
+                    : new NoteWithExpDate(noteDto.getTitle(), noteDto.getText(), noteDto.getRemindDate());
             user.getNotes().add(note);
             userRepository.save(user);
             URI location = ServletUriComponentsBuilder
@@ -84,12 +84,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<?> updateNote(String username, int noteId, Note noteBody) {
+    public ResponseEntity<?> updateNote(String username, int noteId, NoteDto noteDto) {
         User user = this.validateUser(username);
-        Note note = user.getNotes().get(noteId);
-        note.setText(noteBody.getText());
-        note.setTitle(noteBody.getTitle());
-        note.setRemindDate(noteBody.getRemindDate());
+        if (noteDto.getRemindDate() != null) {
+            NoteWithExpDate note = (NoteWithExpDate) user.getNotes().get(noteId)
+                    .setText(noteDto.getText())
+                    .setTitle(noteDto.getTitle());
+            note.setRemindDate(noteDto.getRemindDate());
+        } else {
+            user.getNotes().get(noteId)
+                    .setText(noteDto.getText())
+                    .setTitle(noteDto.getTitle());
+        }
         userRepository.save(user);
         return ResponseEntity.accepted().build();
     }

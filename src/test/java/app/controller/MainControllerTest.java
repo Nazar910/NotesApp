@@ -2,6 +2,7 @@ package app.controller;
 
 import app.Application;
 import app.model.Note;
+import app.model.NoteDto;
 import app.model.User;
 import app.model.UserRepository;
 import org.junit.Before;
@@ -47,7 +48,7 @@ public class MainControllerTest {
 
     private MockMvc mockMvc;
 
-    private String userName = "bdussault";
+    private String userName = "test_user";
 
     private HttpMessageConverter mappingJackson2HttpMessageConverter;
 
@@ -79,11 +80,11 @@ public class MainControllerTest {
 
         this.userRepository.deleteAll();
 
-        User newUser = this.newUser(userName, "password", "email@", new ArrayList<>());
+        User newUser = new User(userName, "password", "email@", new ArrayList<>());
         this.userRepository.save(newUser);
         this.user = userRepository.findByUsername(newUser.getUsername()).get();
-        Note newNote1 = this.newNote("title1", "text1");
-        Note newNote2 = this.newNote("title2", "text2");
+        Note newNote1 = new Note("title1", "text1");
+        Note newNote2 = new Note("title2", "text2");
         this.user.getNotes().add(newNote1);
         this.user.getNotes().add(newNote2);
         this.userRepository.save(user);
@@ -93,7 +94,7 @@ public class MainControllerTest {
     @Test
     public void createAlreadyExistingUser() throws Exception {
         mockMvc.perform(post("/api/users/")
-                .content(this.json(this.newUser(this.userName, "", "", new ArrayList<>())))
+                .content(this.json(new User(this.userName, "", "", new ArrayList<>())))
                 .contentType(this.contentType))
                 .andExpect(status().isConflict());
     }
@@ -101,7 +102,7 @@ public class MainControllerTest {
     @Test
     public void createNoteUserNotFound() throws Exception {
         mockMvc.perform(post("/api/users/george")
-                .content(this.json(this.newNote("title1", "text1")))
+                .content(this.json(new NoteDto("title1", "text1")))
                 .contentType(this.contentType))
                 .andExpect(status().isNotFound());
     }
@@ -138,7 +139,7 @@ public class MainControllerTest {
     @Test
     public void createUser() throws Exception {
         mockMvc.perform(post("/api/users/")
-                .content(this.json(newUser("user1", "password1", "email@1", new ArrayList<>())))
+                .content(this.json(new User("user1", "password1", "email@1", new ArrayList<>())))
                 .contentType(this.contentType))
                 .andExpect(status().isCreated());
     }
@@ -154,7 +155,7 @@ public class MainControllerTest {
     @Test
     public void updateUser() throws Exception {
         mockMvc.perform(put("/api/users/" + this.userName)
-                .content(json(newUser(this.userName, "password1", "email@1", new ArrayList<>())))
+                .content(json(new User(this.userName, "password1", "email@1", new ArrayList<>())))
                 .contentType(this.contentType))
                 .andExpect(status().isAccepted());
     }
@@ -168,7 +169,7 @@ public class MainControllerTest {
     @Test
     public void createNote() throws Exception {
         mockMvc.perform(post("/api/users/" + this.userName)
-                .content(this.json(newNote("title3", "text3")))
+                .content(this.json(new NoteDto("title3", "text3")))
                 .contentType(this.contentType))
                 .andExpect(status().isCreated());
     }
@@ -176,7 +177,7 @@ public class MainControllerTest {
     @Test
     public void createNoteNullBody() throws Exception {
         mockMvc.perform(post("/api/users/" + this.userName)
-                .content(this.json(new Note()))
+                .content(this.json(new NoteDto()))
                 .contentType(this.contentType))
                 .andExpect(status().isNoContent());
     }
@@ -184,7 +185,7 @@ public class MainControllerTest {
     @Test
     public void updateNote() throws Exception {
         mockMvc.perform(put("/api/users/" + this.userName + "/" + this.noteId)
-                .content(this.json(newNote("title11", "text11")))
+                .content(this.json(new NoteDto("title11", "text11")))
                 .contentType(this.contentType))
                 .andExpect(status().isAccepted());
     }
@@ -200,21 +201,5 @@ public class MainControllerTest {
         this.mappingJackson2HttpMessageConverter.write(
                 o, MediaType.APPLICATION_JSON, mockHttpOutputMessage);
         return mockHttpOutputMessage.getBodyAsString();
-    }
-
-    private User newUser(String username, String password, String email, List<Note> notes) {
-        User user = new User();
-        user.setUsername(username);
-        user.setPassword(password);
-        user.setEmail(email);
-        user.setNotes(notes);
-        return user;
-    }
-
-    private Note newNote(String title, String text) {
-        Note note = new Note();
-        note.setTitle(title);
-        note.setText(text);
-        return note;
     }
 }
